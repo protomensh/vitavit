@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>VitaViva | precise wellness · dynamic recommendations</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f5f8f2; color: #1a2e1f; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 1rem 1.5rem; }
+    .store-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .logo h1 { font-size: 1.8rem; background: linear-gradient(135deg, #1e6b3b, #c89d2f); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .logo p { font-size: 0.8rem; color: #2b5e35; }
+    .cart-icon { background: white; padding: 0.4rem 1rem; border-radius: 60px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+    .quiz-panel { background: white; border-radius: 1.5rem; padding: 1rem 1.5rem; margin-bottom: 1.5rem; }
+    .quiz-grid { display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: flex-end; }
+    .input-group { flex: 1 1 130px; min-width: 110px; }
+    .input-group label { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: #2b5e35; }
+    .input-group select, .input-group input { width: 100%; padding: 6px 8px; border-radius: 40px; border: 1px solid #ccdfcf; background: #fffef7; font-size: 0.8rem; }
+    .btn-recommend { background: #1f6e3c; color: white; border: none; padding: 6px 16px; border-radius: 40px; font-weight: 700; cursor: pointer; }
+    .categories-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 1.2rem; margin: 1rem 0; }
+    .vital-card { background: #fefef7; border-radius: 1.2rem; padding: 1rem; border: 1px solid #e2efd8; transition: 0.2s; }
+    .meter-bar { background: #e2e8ce; height: 6px; border-radius: 10px; margin: 6px 0; overflow: hidden; }
+    .meter-fill { background: linear-gradient(90deg, #7cb342, #2b7a3e); height: 100%; width: 0%; border-radius: 10px; }
+    .shop-link { display: flex; align-items: center; gap: 4px; font-size: 0.7rem; font-weight: 600; color: #1f6e3c; border: 1px solid #cfe3c3; padding: 4px 8px; border-radius: 10px; cursor: pointer; background: white; }
+    .shop-link:hover { background: #1f6e3c; color: white; }
+    .shop-link:hover .cat-dot { filter: brightness(1.5); }
+    .product-option-list { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; }
+    .cat-dots { display: inline-flex; gap: 2px; margin-left: auto; flex-shrink: 0; }
+    .cat-dot { width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.55rem; line-height: 1; }
+    .buy-all-category { background: #e8f0e2; border: none; font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 40px; cursor: pointer; margin-top: 8px; width: 100%; text-align: center; display: flex; align-items: center; justify-content: center; gap: 5px; }
+    .buy-all-category:hover { background: #1f6e3c; color: white; }
+    .tiers { display: flex; gap: 0.8rem; margin: 1rem 0; }
+    .tier-btn { background: #ecf3e5; border: none; padding: 0.4rem 1.2rem; border-radius: 40px; font-weight: 700; cursor: pointer; }
+    .tier-btn.active { background: #1f6e3c; color: white; }
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .product-card { background: white; border-radius: 1rem; padding: 0.8rem; border: 1px solid #e8f0e2; }
+    .product-img { font-size: 2rem; text-align: center; }
+    .product-name { font-weight: 800; font-size: 0.9rem; margin-top: 0.3rem; }
+    .product-desc { font-size: 0.65rem; color: #556b5a; }
+    .price { font-weight: 800; font-size: 1rem; margin: 0.3rem 0; color: #1f6e3c; }
+    .add-to-cart-btn { background: #eef3e8; border: none; border-radius: 60px; padding: 4px 8px; font-size: 0.7rem; width: 100%; cursor: pointer; }
+    .health-badges { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0; }
+    .health-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 0.6rem; font-weight: 600; padding: 2px 7px; border-radius: 20px; line-height: 1.3; }
+    .health-badge.hb-heart { background: #fde8e8; color: #b91c1c; }
+    .health-badge.hb-mobility { background: #e0f2fe; color: #0369a1; }
+    .health-badge.hb-vision { background: #f3e8ff; color: #7c3aed; }
+    .health-badge.hb-cognitive { background: #fef3c7; color: #b45309; }
+    .health-badge.hb-hydration { background: #e0f7fa; color: #0e7490; }
+    .health-badge.hb-liver { background: #ecfccb; color: #4d7c0f; }
+    .cart-overlay { position: fixed; top: 0; right: -450px; width: 380px; height: 100%; background: white; box-shadow: -5px 0 25px rgba(0,0,0,0.2); z-index: 1000; transition: 0.3s; display: flex; flex-direction: column; padding: 1rem; }
+    .cart-overlay.open { right: 0; }
+    .cart-items-list { flex: 1; overflow-y: auto; margin: 0.5rem 0; font-size: 0.8rem; }
+    .cart-item-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; border-bottom: 1px dashed #e2e8dd; padding: 0.3rem 0; }
+    .cart-summary { border-top: 2px solid #d9e5cf; padding-top: 0.5rem; }
+    .checkout-pay-btn { background: #1f6e3c; color: white; width: 100%; padding: 8px; border-radius: 60px; font-weight: 800; border: none; margin-top: 8px; }
+    .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.3); visibility: hidden; z-index: 999; }
+    .backdrop.show { visibility: visible; }
+    .payment-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; width: 90%; max-width: 400px; border-radius: 1.5rem; padding: 1.2rem; z-index: 1100; display: none; }
+    .payment-modal.open { display: block; }
+    footer { text-align: center; font-size: 0.65rem; color: #5c7568; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="store-header">
+    <div class="logo"><h1><i class="fas fa-microphone-alt"></i> VitaViva</h1><p>vitamins and nutritional supplements for better health and activity</p></div>
+    <div class="cart-icon" id="cartIconBtn"><i class="fas fa-shopping-bag"></i> Cart (<span id="cartCount">0</span>)</div>
+  </div>
+
+  <div class="quiz-panel">
+    <h3><i class="fas fa-chart-line"></i> Your complete wellness profile</h3>
+    <div class="quiz-grid" id="quizGrid">
+      <!-- 15+ input fields -->
+      <div class="input-group"><label>Age</label><input type="number" id="age" value="42"></div>
+      <div class="input-group"><label>Weight (kg)</label><input type="number" id="weight" value="75"></div>
+      <div class="input-group"><label>Height (cm)</label><input type="number" id="height" value="175"></div>
+      <div class="input-group"><label>Ethnicity</label><select id="ethnicity"><option value="caucasian">Caucasian</option><option value="african">African</option><option value="asian">Asian</option><option value="hispanic">Hispanic</option><option value="other">Other</option></select></div>
+      <div class="input-group"><label>Alcohol</label><select id="alcohol"><option value="none">None</option><option value="light">Light</option><option value="medium">Medium</option><option value="heavy">Heavy</option></select></div>
+      <div class="input-group"><label>Smoking</label><select id="smoking"><option value="none">None</option><option value="light">1-2/day</option><option value="moderate">10/day</option><option value="heavy">Pack/day</option></select></div>
+      <div class="input-group"><label>Health focus</label><select id="health"><option value="general">General</option><option value="immunity">Immunity</option><option value="digestion">Digestion</option><option value="energy">Energy</option><option value="heart">Heart</option><option value="liver">Liver</option></select></div>
+      <div class="input-group"><label>Blood pressure</label><select id="bp"><option value="normal">Normal</option><option value="elevated">Elevated</option><option value="low">Low</option></select></div>
+      <div class="input-group"><label>Diet</label><select id="diet"><option value="omnivore">Omnivore</option><option value="vegetarian">Vegetarian</option><option value="vegan">Vegan</option><option value="mediterranean">Mediterranean</option><option value="keto">Keto</option><option value="paleo">Paleo</option></select></div>
+      <div class="input-group"><label>Activity</label><select id="activity"><option value="sedentary">Sedentary</option><option value="light">Light</option><option value="moderate">Moderate</option><option value="active">Active</option><option value="very active">Very active</option></select></div>
+      <div class="input-group"><label>Region</label><select id="region"><option value="northern">Northern</option><option value="southern">Southern</option><option value="coastal">Coastal</option><option value="mountain">Mountain</option></select></div>
+      <div class="input-group"><label>Support needs</label><select id="disability"><option value="none">None</option><option value="mobility">Mobility</option><option value="vision">Vision</option><option value="cognitive">Cognitive</option></select></div>
+      <div><button class="btn-recommend" id="refreshBtn"><i class="fas fa-sync-alt"></i> Refresh</button></div>
+    </div>
+    <div id="categoriesGrid" class="categories-grid"></div>
+  </div>
+
+  <div class="tiers" id="tierButtons">
+    <button class="tier-btn active" data-tier="standard">🌿 Standard (55)</button>
+    <button class="tier-btn" data-tier="elevated">✨ Elevated (55)</button>
+    <button class="tier-btn" data-tier="luxury">👑 Luxury (55)</button>
+  </div>
+  <div id="productsContainer" class="products-grid"></div>
+  <footer>⚡ 55 supplements per tier · 12-axis personalized scoring · multi-factor risk interactions · diversity-enforced recommendations</footer>
+</div>
+
+<!-- Cart sidebar & modal (functional but simplified for space) -->
+<div id="cartOverlay" class="cart-overlay"><div style="display:flex; justify-content:space-between;"><span><i class="fas fa-shopping-bag"></i> Cart</span><i class="fas fa-times" id="closeCartBtn" style="cursor:pointer;"></i></div><div id="cartItemListContainer" class="cart-items-list"></div><div class="cart-summary"><div class="summary-line"><span>Subtotal</span><span id="cartSubtotal">$0.00</span></div><div class="summary-line"><span>Shipping</span><span id="cartShipping">$0.00</span></div><div class="summary-line"><span>Tax (10%)</span><span id="cartTax">$0.00</span></div><div class="summary-line" style="font-weight:800"><span>Total</span><span id="cartTotalAmount">$0.00</span></div><div class="promo-input"><input type="text" id="promoCode" placeholder="VITA10"><button id="applyPromoBtn">Apply</button></div><button class="checkout-pay-btn" id="openPaymentBtn">Pay now</button></div></div>
+<div id="backdrop" class="backdrop"></div>
+<div id="paymentModal" class="payment-modal"><h3>Secure payment</h3><div id="paymentDetails"></div><input type="text" placeholder="Card holder"><input type="text" placeholder="Card number"><button id="confirmPaymentBtn">Pay</button><button id="closePaymentBtn">Cancel</button></div>
+
+<script>
+  // ---------- EXPANDED PRODUCT DATABASE v2 — tags fully aligned to scoring engine axes ----------
+  // Tag taxonomy:
+  //   Category:    heart, mobility, vision, cognitive, hydration, liver
+  //   Age:         age_senior, age_middle, longevity
+  //   BMI:         metabolic, inflammation, circulation
+  //   Alcohol:     alcohol_heavy, alcohol_medium, liver
+  //   Smoking:     smoking_heavy, smoking_moderate, lung, antioxidant
+  //   BP:          bp_elevated, bp_low
+  //   Diet:        diet_vegan, diet_vegetarian, diet_keto, diet_paleo, diet_mediterranean, diet_omnivore
+  //   Deficiency:  b12, iron, bone, electrolyte
+  //   Activity:    activity_very active, activity_active, activity_sedentary, recovery, joint
+  //   Region:      region_northern, region_southern, region_coastal, region_mountain
+  //   Disability:  disability_mobility, disability_vision, disability_cognitive
+  //   Focus:       immunity, digestion, probiotic, energy, mitochondrial, adaptogen, cholesterol
+  //   General:     sleep, stress, skin
+
+  const productDB = {
+    standard: [
+      // ——— HEART & CARDIOVASCULAR ———
+      { id: "s01", name: "Ubiquinol CoQ10", desc: "Mitochondrial energy for heart muscle; statin users especially benefit", price: 24.90, icon: "❤️",
+        tags: ["heart","energy","mitochondrial","bp_elevated","age_senior","age_middle","circulation"] },
+      { id: "s02", name: "Omega-3 Fish Oil (EPA/DHA)", desc: "Triglyceride reduction, anti-inflammatory, brain support", price: 19.90, icon: "🐟",
+        tags: ["heart","cognitive","inflammation","cholesterol","diet_omnivore","diet_mediterranean","age_middle"] },
+      { id: "s19", name: "Berberine HCl", desc: "AMPK activator for glucose, lipids & metabolic health", price: 31.90, icon: "🩸",
+        tags: ["heart","metabolic","diet_keto","bp_elevated","cholesterol","inflammation"] },
+      { id: "s21", name: "Pycnogenol", desc: "Pine bark extract for microcirculation & vascular tone", price: 39.90, icon: "🌲",
+        tags: ["heart","vision","circulation","bp_elevated","antioxidant","age_senior","skin"] },
+      { id: "s30", name: "Hesperidin + Diosmin", desc: "Citrus bioflavonoids for venous tone & blood flow", price: 29.90, icon: "🍊",
+        tags: ["heart","circulation","bp_elevated","inflammation","activity_sedentary"] },
+      { id: "s35", name: "Red Yeast Rice", desc: "Natural monacolin K for cholesterol management", price: 31.90, icon: "🍚",
+        tags: ["heart","cholesterol","bp_elevated","metabolic","age_senior"] },
+      { id: "s36", name: "Pantethine (B5 derivative)", desc: "CoA precursor; supports lipid metabolism", price: 29.90, icon: "🅱️",
+        tags: ["heart","energy","metabolic","cholesterol","liver"] },
+      { id: "s37", name: "Nattokinase", desc: "Fibrinolytic enzyme supporting healthy blood flow", price: 34.90, icon: "🫘",
+        tags: ["heart","circulation","bp_elevated","age_senior","diet_vegetarian"] },
+
+      // ——— MOBILITY & JOINTS ———
+      { id: "s03", name: "Magnesium Glycinate", desc: "Highly absorbable; relaxes muscles, supports sleep & BP", price: 21.90, icon: "⚡",
+        tags: ["mobility","sleep","bp_elevated","activity_sedentary","cognitive","bone","recovery","electrolyte"] },
+      { id: "s04", name: "Glucosamine + MSM", desc: "Cartilage precursors for joint repair & comfort", price: 29.90, icon: "🦴",
+        tags: ["mobility","joint","age_senior","disability_mobility","inflammation","activity_active","recovery"] },
+      { id: "s20", name: "Tart Cherry Extract", desc: "Anthocyanins reduce uric acid & post-exercise inflammation", price: 26.90, icon: "🍒",
+        tags: ["mobility","inflammation","activity_active","recovery","joint","antioxidant","sleep"] },
+      { id: "s24", name: "Hyaluronic Acid", desc: "Synovial fluid support for joint cushioning", price: 29.90, icon: "💧",
+        tags: ["mobility","joint","age_senior","skin","disability_mobility","age_middle"] },
+      { id: "s28", name: "Calcium + Magnesium + D3", desc: "Bone density triad; critical for vegans & seniors", price: 22.90, icon: "🦴",
+        tags: ["mobility","bone","age_senior","diet_vegan","diet_vegetarian","region_northern","disability_mobility"] },
+      { id: "s38", name: "Boswellia Serrata", desc: "5-LOX inhibitor; Ayurvedic joint inflammation support", price: 26.90, icon: "🌳",
+        tags: ["mobility","joint","inflammation","disability_mobility","age_senior","diet_paleo"] },
+      { id: "s39", name: "Collagen Peptides Type II", desc: "Hydrolyzed collagen for cartilage, tendons & skin", price: 31.90, icon: "🦴",
+        tags: ["mobility","joint","skin","age_middle","age_senior","activity_active","recovery","diet_paleo"],
+        dietRestrict: (diet) => diet !== "vegan" },
+      { id: "s40", name: "Vitamin K2 (MK-7)", desc: "Directs calcium to bones, away from arteries", price: 28.90, icon: "🦴",
+        tags: ["mobility","bone","heart","circulation","age_senior","diet_vegan","region_northern"] },
+
+      // ——— VISION ———
+      { id: "s05", name: "Lutein & Zeaxanthin", desc: "Macular pigment density; protects against blue light & UV", price: 24.90, icon: "👁️",
+        tags: ["vision","age_senior","age_middle","region_southern","disability_vision","antioxidant","skin"] },
+      { id: "s06", name: "Bilberry Extract", desc: "Anthocyanins for retinal blood flow & night vision", price: 22.90, icon: "🫐",
+        tags: ["vision","antioxidant","disability_vision","circulation","age_senior"] },
+      { id: "s29", name: "Astaxanthin", desc: "Crosses blood-retinal barrier; strongest carotenoid antioxidant", price: 34.90, icon: "🦐",
+        tags: ["vision","skin","inflammation","antioxidant","age_middle","region_southern","heart","recovery"],
+        dietRestrict: (diet) => diet !== "vegan" },
+      { id: "s41", name: "Saffron Extract (Affron)", desc: "Clinically shown to support macular health & mood", price: 36.90, icon: "🌸",
+        tags: ["vision","cognitive","stress","disability_vision","antioxidant","age_senior"] },
+      { id: "s42", name: "Vitamin A (Retinyl Palmitate)", desc: "Essential for rhodopsin production & low-light vision", price: 14.90, icon: "🥕",
+        tags: ["vision","immunity","skin","diet_vegan","disability_vision","region_northern"] },
+
+      // ——— COGNITIVE & BRAIN ———
+      { id: "s07", name: "Lion's Mane Mushroom", desc: "NGF stimulator; supports neurogenesis & nerve repair", price: 29.90, icon: "🦁",
+        tags: ["cognitive","age_senior","disability_cognitive","immunity","adaptogen","diet_vegan"] },
+      { id: "s08", name: "Bacopa Monnieri", desc: "Bacosides enhance memory consolidation & recall", price: 27.90, icon: "🧠",
+        tags: ["cognitive","stress","disability_cognitive","adaptogen","age_middle","antioxidant"] },
+      { id: "s17", name: "Ashwagandha KSM-66", desc: "Cortisol modulator; anxiolytic adaptogen", price: 29.90, icon: "🌱",
+        tags: ["energy","cognitive","stress","adaptogen","bp_elevated","activity_sedentary","sleep"] },
+      { id: "s18", name: "Rhodiola Rosea", desc: "Anti-fatigue adaptogen; improves focus under stress", price: 28.90, icon: "🌺",
+        tags: ["energy","cognitive","adaptogen","activity_active","region_northern","region_mountain","stress"] },
+      { id: "s22", name: "Citicoline (CDP-Choline)", desc: "Acetylcholine & phospholipid precursor for brain cell membranes", price: 34.90, icon: "🧠",
+        tags: ["cognitive","age_middle","age_senior","disability_cognitive","energy","vision"] },
+      { id: "s25", name: "Melatonin SR (Sustained Release)", desc: "Circadian rhythm entrainment; antioxidant in brain", price: 18.90, icon: "😴",
+        tags: ["cognitive","sleep","age_senior","antioxidant","region_northern"] },
+      { id: "s34", name: "Fisetin (Senolytic)", desc: "Clears senescent cells; strawberry-derived polyphenol", price: 44.90, icon: "🧬",
+        tags: ["longevity","cognitive","age_senior","antioxidant","inflammation","heart"] },
+      { id: "s43", name: "Phosphatidylserine (PS)", desc: "Membrane phospholipid; supports cortisol clearance & memory", price: 38.90, icon: "🧠",
+        tags: ["cognitive","stress","age_senior","disability_cognitive","energy","age_middle"] },
+
+      // ——— HYDRATION & ELECTROLYTES ———
+      { id: "s09", name: "Electrolyte Powder", desc: "Na/K/Mg/Ca in clinical ratio; zero sugar", price: 18.90, icon: "💧",
+        tags: ["hydration","electrolyte","activity_very active","activity_active","region_southern","region_mountain","diet_keto","recovery"] },
+      { id: "s10", name: "Coconut Water Concentrate", desc: "Natural potassium-rich isotonic hydration", price: 16.90, icon: "🥥",
+        tags: ["hydration","electrolyte","diet_vegan","activity_active","region_southern","bp_low"] },
+      { id: "s44", name: "Oral Rehydration Salts (WHO formula)", desc: "Glucose-sodium co-transport for maximum absorption", price: 12.90, icon: "💧",
+        tags: ["hydration","electrolyte","activity_very active","region_mountain","recovery","diet_vegan","diet_keto"] },
+      { id: "s45", name: "Trace Mineral Drops", desc: "72 ionic trace minerals from inland sea; supports enzyme function", price: 19.90, icon: "🌊",
+        tags: ["hydration","electrolyte","bone","immunity","diet_vegan","region_mountain","region_coastal"] },
+      { id: "s46", name: "Potassium Citrate", desc: "Supports healthy blood pressure & fluid balance", price: 15.90, icon: "⚡",
+        tags: ["hydration","electrolyte","bp_elevated","heart","activity_active","diet_keto","recovery"] },
+
+      // ——— LIVER & DETOX ———
+      { id: "s11", name: "Milk Thistle (80% Silymarin)", desc: "Hepatoprotective; stabilizes liver cell membranes", price: 27.90, icon: "🌿",
+        tags: ["liver","alcohol_heavy","alcohol_medium","smoking_heavy","diet_keto","antioxidant"] },
+      { id: "s12", name: "NAC 600mg", desc: "Glutathione precursor; phase II detox & lung mucus support", price: 22.90, icon: "🛡️",
+        tags: ["liver","lung","smoking_moderate","smoking_heavy","alcohol_medium","antioxidant","immunity"] },
+      { id: "s23", name: "Alpha-Lipoic Acid (R-form)", desc: "Universal antioxidant; regenerates vitamins C & E; neuroprotective", price: 27.90, icon: "🧬",
+        tags: ["liver","cognitive","antioxidant","alcohol_medium","metabolic","age_middle","inflammation"] },
+      { id: "s32", name: "Schisandra Berry", desc: "Phase I & II liver enzyme activator; adaptogenic", price: 27.90, icon: "🍒",
+        tags: ["liver","energy","adaptogen","stress","alcohol_medium","antioxidant","immunity"] },
+      { id: "s47", name: "TUDCA (Tauroursodeoxycholic Acid)", desc: "Bile acid support for liver & gut barrier integrity", price: 42.90, icon: "🛡️",
+        tags: ["liver","digestion","alcohol_heavy","diet_keto","metabolic","inflammation"] },
+      { id: "s48", name: "Glutathione (Liposomal)", desc: "Master antioxidant; direct delivery bypasses digestion", price: 49.90, icon: "🛡️",
+        tags: ["liver","antioxidant","smoking_heavy","alcohol_heavy","skin","immunity","lung","age_senior"] },
+
+      // ——— IMMUNITY ———
+      { id: "s13", name: "Vitamin D3 5000 IU + K2", desc: "Immune modulation + calcium direction; critical in low-sun regions", price: 24.90, icon: "☀️",
+        tags: ["immunity","bone","region_northern","diet_vegan","diet_vegetarian","age_senior","mobility"] },
+      { id: "s14", name: "Zinc Picolinate + Quercetin", desc: "Zinc ionophore synergy for viral defense & histamine control", price: 21.90, icon: "🛡️",
+        tags: ["immunity","diet_vegetarian","diet_vegan","antioxidant","lung","inflammation","allergy"] },
+      { id: "s49", name: "Vitamin C (Liposomal)", desc: "High-bioavailability C for collagen, immunity & antioxidant defense", price: 24.90, icon: "🍋",
+        tags: ["immunity","antioxidant","skin","smoking_moderate","smoking_heavy","recovery","iron","region_northern"] },
+      { id: "s50", name: "Elderberry + Echinacea", desc: "Dual botanical immune activation; clinically studied for cold/flu", price: 22.90, icon: "🫐",
+        tags: ["immunity","antioxidant","region_northern","diet_vegan","lung"] },
+      { id: "s51", name: "Beta-Glucan (1,3/1,6)", desc: "Yeast-derived immune primer; activates macrophages & NK cells", price: 34.90, icon: "🛡️",
+        tags: ["immunity","antioxidant","age_senior","diet_vegan","adaptogen"] },
+
+      // ——— DIGESTION ———
+      { id: "s15", name: "Probiotic 50B CFU (Multi-strain)", desc: "Lactobacillus + Bifidobacterium for gut microbiome diversity", price: 34.90, icon: "🦠",
+        tags: ["digestion","probiotic","immunity","diet_omnivore","diet_mediterranean","inflammation"] },
+      { id: "s16", name: "Digestive Enzymes (Full-spectrum)", desc: "Protease, lipase, amylase, cellulase for complete macronutrient breakdown", price: 25.90, icon: "🍽️",
+        tags: ["digestion","age_senior","diet_omnivore","diet_paleo","diet_keto","metabolic"] },
+
+      // ——— ENERGY & ADAPTOGENS ———
+      { id: "s26", name: "Vitamin B Complex (Methylated)", desc: "Active forms B1/B2/B6/B12/Folate; critical for vegans & drinkers", price: 23.90, icon: "🅱️",
+        tags: ["energy","cognitive","diet_vegan","diet_vegetarian","b12","alcohol_medium","alcohol_heavy","liver","age_middle"] },
+      { id: "s27", name: "Iron Bisglycinate", desc: "Gentle chelated iron; non-constipating; pair with vitamin C", price: 19.90, icon: "🩸",
+        tags: ["energy","iron","diet_vegan","diet_vegetarian","disability_mobility","bp_low","region_mountain"] },
+      { id: "s31", name: "PQQ (Pyrroloquinoline Quinone)", desc: "Mitochondrial biogenesis factor; pairs synergistically with CoQ10", price: 49.90, icon: "⚡",
+        tags: ["energy","mitochondrial","heart","cognitive","longevity","age_middle","age_senior"] },
+      { id: "s33", name: "Cordyceps Militaris", desc: "Adenosine analog; enhances oxygen utilization & VO2 max", price: 32.90, icon: "🍄",
+        tags: ["energy","lung","activity_active","activity_very active","adaptogen","immunity","region_mountain","recovery"] },
+      { id: "s52", name: "Creatine Monohydrate", desc: "ATP recycling; benefits brain, muscle & aging populations", price: 19.90, icon: "💪",
+        tags: ["energy","cognitive","mobility","activity_active","activity_very active","recovery","age_senior","diet_vegan"] },
+
+      // ——— NATURAL FOODS ———
+      { id: "s_nat1", name: "Probiotic Yogurt (organic)", desc: "Live Lactobacillus cultures + bioavailable calcium", price: 5.90, icon: "🥛",
+        tags: ["digestion","probiotic","immunity","bone","diet_omnivore","diet_mediterranean"],
+        dietRestrict: (diet) => diet !== "vegan" },
+      { id: "s_nat2", name: "Fresh Ginger Root", desc: "Gingerol: COX-2 inhibitor, prokinetic, anti-nausea", price: 3.90, icon: "🫚",
+        tags: ["digestion","inflammation","immunity","circulation","diet_vegan","diet_paleo","diet_mediterranean"],
+        dietRestrict: () => true },
+      { id: "s_nat3", name: "Raw Manuka Honey (UMF 15+)", desc: "Methylglyoxal antimicrobial; prebiotic oligosaccharides", price: 18.90, icon: "🍯",
+        tags: ["immunity","digestion","skin","energy","antioxidant"],
+        dietRestrict: (diet) => diet !== "vegan" },
+    ],
+    elevated: [],
+    luxury: []
+  };
+  // Populate elevated and luxury tiers with premium versions
+  productDB.elevated = productDB.standard.map(p => ({ ...p, id: "e_"+p.id, price: p.price * 1.7, name: p.name + " (Premium)" }));
+  productDB.luxury = productDB.standard.map(p => ({ ...p, id: "l_"+p.id, price: p.price * 2.8, name: p.name + " (Gold)" }));
+
+  // ---------------- CART CONTROLLER (compact) ----------------
+  class StoreController {
+    constructor() { this.cart = []; this.activeTier = "standard"; this.promo = 0; this.load(); }
+    getProducts() { return productDB[this.activeTier]; }
+    getProduct(id) { return this.getProducts().find(p => p.id === id); }
+    addToCart(id, qty=1) { let p = this.getProduct(id); if(!p) return; let ex = this.cart.find(i=>i.id===id); if(ex) ex.qty += qty; else this.cart.push({id, name:p.name, price:p.price, qty}); this.save(); this.updateUI(); this.toast(`Added ${p.name}`); }
+    addMultiple(ids) { ids.forEach(id => this.addToCart(id,1)); }
+    updateQty(id, delta) { let idx = this.cart.findIndex(i=>i.id===id); if(idx!==-1) { let newQ = this.cart[idx].qty+delta; if(newQ<=0) this.cart.splice(idx,1); else this.cart[idx].qty = newQ; this.save(); this.updateUI(); } }
+    removeItem(id) { this.cart = this.cart.filter(i=>i.id!==id); this.save(); this.updateUI(); }
+    clearCart() { this.cart = []; this.promo=0; document.getElementById("promoCode").value=""; this.save(); this.updateUI(); }
+    applyPromo(code) { if(code.toUpperCase()==="VITA10") { this.promo=0.10; return true; } else if(code.toUpperCase()==="FREE5") { this.shippingFree=true; return true; } else return false; }
+    subtotal() { return this.cart.reduce((s,i)=>s + i.price*i.qty,0); }
+    shipping() { let sub = this.subtotal(); if(sub===0) return 0; if(sub>=100) return 0; return 5; }
+    tax() { let ad = this.subtotal() * (1-this.promo); return ad*0.1; }
+    total() { let ad = this.subtotal()*(1-this.promo); return ad + this.shipping() + this.tax(); }
+    breakdown() { let sub=this.subtotal(); let ad=sub*(1-this.promo); return {sub, discount:sub*this.promo, after:ad, ship:this.shipping(), tax:this.tax(), total:ad+this.shipping()+this.tax()}; }
+    save() { localStorage.setItem("vitacart_dyn",JSON.stringify({cart:this.cart, tier:this.activeTier})); }
+    load() { let d = localStorage.getItem("vitacart_dyn"); if(d) try{ let o=JSON.parse(d); this.cart=o.cart||[]; this.activeTier=o.tier||"standard"; }catch(e){} this.updateUI(); }
+    updateUI() { 
+      let count = this.cart.reduce((s,i)=>s+i.qty,0);
+      document.getElementById("cartCount").innerText = count;
+      let itemsDiv = document.getElementById("cartItemListContainer");
+      if(this.cart.length===0) itemsDiv.innerHTML = "<div>Cart empty</div>";
+      else {
+        itemsDiv.innerHTML = this.cart.map(i => `<div class="cart-item-row"><div><strong>${i.name}</strong><br/>$${i.price}</div><div><button class="cart-minus" data-id="${i.id}">-</button> ${i.qty} <button class="cart-plus" data-id="${i.id}">+</button> <button class="cart-remove" data-id="${i.id}">🗑️</button></div><div>$${(i.price*i.qty).toFixed(2)}</div></div>`).join('');
+        document.querySelectorAll(".cart-minus").forEach(b => b.addEventListener("click",()=>this.updateQty(b.dataset.id,-1)));
+        document.querySelectorAll(".cart-plus").forEach(b => b.addEventListener("click",()=>this.updateQty(b.dataset.id,1)));
+        document.querySelectorAll(".cart-remove").forEach(b => b.addEventListener("click",()=>this.removeItem(b.dataset.id)));
+      }
+      let b = this.breakdown();
+      document.getElementById("cartSubtotal").innerText = `$${b.sub.toFixed(2)}`;
+      document.getElementById("cartShipping").innerText = `$${b.ship.toFixed(2)}`;
+      document.getElementById("cartTax").innerText = `$${b.tax.toFixed(2)}`;
+      document.getElementById("cartTotalAmount").innerText = `$${b.total.toFixed(2)}`;
+    }
+    renderProductGrid() {
+      let container = document.getElementById("productsContainer");
+      let prods = this.getProducts();
+      container.innerHTML = prods.map(p => {
+        let badges = getHealthBadges(p);
+        return `<div class="product-card"><div class="product-img">${p.icon||'💊'}</div><div class="product-name">${p.name}</div><div class="product-desc">${p.desc||''}</div><div class="health-badges">${badges}</div><div class="price">$${p.price.toFixed(2)}</div><button class="add-to-cart" data-id="${p.id}">Add to cart</button></div>`;
+      }).join('');
+      document.querySelectorAll(".add-to-cart").forEach(btn => btn.addEventListener("click",()=>this.addToCart(btn.dataset.id,1)));
+    }
+    toast(msg) { let t = document.getElementById("toastMsg"); if(!t){ t=document.createElement("div"); t.id="toastMsg"; t.style.cssText="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#1f3e2c; color:white; padding:5px 15px; border-radius:40px; z-index:2000;"; document.body.appendChild(t); } t.innerText=msg; t.style.opacity=1; setTimeout(()=>t.style.opacity=0,1500); }
+  }
+  // ——— Health category badge mapper ———
+  // Maps each product's tags to the 6 health status categories with icons
+  const HEALTH_CATEGORIES = {
+    heart:     { icon: "❤️", label: "Heart",     css: "hb-heart",     bg: "#fde8e8",
+                 match: ["heart","circulation","bp_elevated","cholesterol","metabolic","bp_low"] },
+    mobility:  { icon: "🦴", label: "Mobility",  css: "hb-mobility",  bg: "#e0f2fe",
+                 match: ["mobility","joint","bone","recovery","inflammation","disability_mobility"] },
+    vision:    { icon: "👁️", label: "Vision",    css: "hb-vision",    bg: "#f3e8ff",
+                 match: ["vision","disability_vision"] },
+    cognitive: { icon: "🧠", label: "Cognitive", css: "hb-cognitive", bg: "#fef3c7",
+                 match: ["cognitive","sleep","stress","adaptogen","disability_cognitive","longevity"] },
+    hydration: { icon: "💧", label: "Hydration", css: "hb-hydration", bg: "#e0f7fa",
+                 match: ["hydration","electrolyte"] },
+    liver:     { icon: "🧪", label: "Liver",     css: "hb-liver",     bg: "#ecfccb",
+                 match: ["liver","alcohol_heavy","alcohol_medium","smoking_heavy","smoking_moderate","lung","antioxidant"] }
+  };
+
+  function getProductCategories(product) {
+    const tags = product.tags || [];
+    let cats = [];
+    for (let [cat, info] of Object.entries(HEALTH_CATEGORIES)) {
+      if (info.match.some(m => tags.includes(m))) cats.push(cat);
+    }
+    return cats;
+  }
+
+  function getHealthBadges(product) {
+    let cats = getProductCategories(product);
+    return cats.map(cat => {
+      let info = HEALTH_CATEGORIES[cat];
+      return `<span class="health-badge ${info.css}">${info.icon} ${info.label}</span>`;
+    }).join('');
+  }
+
+  function getCategoryDots(product) {
+    let cats = getProductCategories(product);
+    if (cats.length === 0) return '';
+    let dots = cats.map(cat => {
+      let info = HEALTH_CATEGORIES[cat];
+      return `<span class="cat-dot" style="background:${info.bg}" title="${info.label}">${info.icon}</span>`;
+    }).join('');
+    return `<span class="cat-dots">${dots}</span>`;
+  }
+
+  let store = new StoreController();
+  store.renderProductGrid();
+
+  // ---------- ENHANCED RECOMMENDATION ENGINE v2 — multi-axis scoring with interactions ----------
+
+  function getUserProfile() {
+    let age = parseInt(document.getElementById("age").value) || 42;
+    let weight = parseFloat(document.getElementById("weight").value) || 75;
+    let height = parseFloat(document.getElementById("height").value) || 175;
+    let bmi = weight / ((height / 100) ** 2);
+    // Derived risk tiers (continuous, not binary)
+    let ageRisk = age < 30 ? 0 : age < 40 ? 0.15 : age < 50 ? 0.35 : age < 60 ? 0.55 : age < 70 ? 0.75 : 0.95;
+    let bmiRisk = bmi < 18.5 ? 0.3 : bmi < 25 ? 0 : bmi < 30 ? 0.25 : bmi < 35 ? 0.5 : 0.7;
+    let alcoholLevel = { none: 0, light: 0.2, medium: 0.5, heavy: 1.0 }[document.getElementById("alcohol").value] || 0;
+    let smokingLevel = { none: 0, light: 0.2, moderate: 0.5, heavy: 1.0 }[document.getElementById("smoking").value] || 0;
+    let activityLevel = { sedentary: 0, light: 0.25, moderate: 0.5, active: 0.75, "very active": 1.0 }[document.getElementById("activity").value] || 0;
+    return {
+      age, bmi, ageRisk, bmiRisk, alcoholLevel, smokingLevel, activityLevel,
+      ethnicity: document.getElementById("ethnicity").value,
+      alcohol: document.getElementById("alcohol").value,
+      smoking: document.getElementById("smoking").value,
+      healthFocus: document.getElementById("health").value,
+      bp: document.getElementById("bp").value,
+      diet: document.getElementById("diet").value,
+      activity: document.getElementById("activity").value,
+      region: document.getElementById("region").value,
+      disability: document.getElementById("disability").value
+    };
+  }
+
+  function productAllowed(p, diet) {
+    if (p.dietRestrict) return p.dietRestrict(diet);
+    return true;
+  }
+
+  // Helper: how many of a set of tags does the product have?
+  function tagOverlap(productTags, targetTags) {
+    return targetTags.reduce((n, t) => n + (productTags.includes(t) ? 1 : 0), 0);
+  }
+
+  // ——— CORE SCORING: decomposes into independent axes, then sums with weights ———
+  function scoreProduct(p, profile) {
+    if (!productAllowed(p, profile.diet)) return -1;
+    let tags = p.tags || [];
+    let s = 0;
+
+    // ————— 1. AGE (continuous, not binary) —————
+    // Seniors benefit from senior-tagged products proportionally
+    if (tags.includes("age_senior")) s += profile.ageRisk * 30;
+    // Mid-life gets partial credit even without "age_middle" tag
+    if (tags.includes("age_middle")) s += (profile.ageRisk >= 0.35 && profile.ageRisk < 0.75) ? 20 : profile.ageRisk * 8;
+    // Longevity products scale with age
+    if (tags.includes("longevity")) s += profile.ageRisk * 25;
+
+    // ————— 2. BMI (graduated) —————
+    if (profile.bmiRisk > 0) {
+      if (tags.includes("metabolic")) s += profile.bmiRisk * 35;
+      if (tags.includes("heart")) s += profile.bmiRisk * 20;
+      if (tags.includes("inflammation")) s += profile.bmiRisk * 15;
+      if (tags.includes("circulation")) s += profile.bmiRisk * 12;
+    }
+    // Underweight: different needs
+    if (profile.bmi < 18.5) {
+      if (tags.includes("energy") || tags.includes("bone")) s += 15;
+    }
+
+    // ————— 3. ALCOHOL (graduated + interactions) —————
+    if (profile.alcoholLevel > 0) {
+      if (tags.includes("alcohol_heavy")) s += profile.alcoholLevel * 40;
+      else if (tags.includes("alcohol_medium")) s += profile.alcoholLevel * 25;
+      if (tags.includes("liver")) s += profile.alcoholLevel * 30;
+      // Alcohol depletes B vitamins and magnesium
+      let depletionTags = tagOverlap(tags, ["energy", "cognitive", "sleep"]);
+      if (depletionTags > 0) s += profile.alcoholLevel * depletionTags * 8;
+    }
+
+    // ————— 4. SMOKING (graduated + interactions) —————
+    if (profile.smokingLevel > 0) {
+      if (tags.includes("smoking_heavy")) s += profile.smokingLevel * 40;
+      else if (tags.includes("smoking_moderate")) s += profile.smokingLevel * 25;
+      if (tags.includes("lung")) s += profile.smokingLevel * 30;
+      if (tags.includes("liver")) s += profile.smokingLevel * 20;
+      // Smoking depletes vitamin C, increases oxidative stress
+      if (tags.includes("antioxidant") || tags.includes("immunity")) s += profile.smokingLevel * 15;
+    }
+
+    // ————— 5. COMPOUNDING RISK: alcohol + smoking together —————
+    let compoundRisk = profile.alcoholLevel * profile.smokingLevel;
+    if (compoundRisk > 0) {
+      if (tags.includes("liver")) s += compoundRisk * 25;
+      if (tags.includes("heart")) s += compoundRisk * 15;
+      if (tags.includes("antioxidant") || tags.includes("inflammation")) s += compoundRisk * 12;
+    }
+
+    // ————— 6. BLOOD PRESSURE —————
+    if (profile.bp === "elevated") {
+      if (tags.includes("bp_elevated")) s += 35;
+      if (tags.includes("heart")) s += 15;
+      if (tags.includes("circulation")) s += 10;
+      // High BP + age compounds cardiovascular risk
+      if (profile.ageRisk > 0.4 && tags.includes("heart")) s += 12;
+    } else if (profile.bp === "low") {
+      if (tags.includes("bp_low")) s += 20;
+      if (tags.includes("energy") || tags.includes("hydration")) s += 10;
+    }
+
+    // ————— 7. DIET (expanded — every diet type gets meaningful scoring) —————
+    const dietTag = "diet_" + profile.diet;
+    if (tags.includes(dietTag)) s += 25;
+    // Diet-specific deficiency risks
+    if (profile.diet === "vegan") {
+      let vDeficiency = tagOverlap(tags, ["b12", "iron", "bone", "energy"]);
+      s += vDeficiency * 12;
+    } else if (profile.diet === "vegetarian") {
+      let vDeficiency = tagOverlap(tags, ["iron", "b12", "energy"]);
+      s += vDeficiency * 10;
+      if (tags.includes("diet_vegetarian")) s += 15;
+    } else if (profile.diet === "keto") {
+      let kTags = tagOverlap(tags, ["electrolyte", "hydration", "liver", "metabolic"]);
+      s += kTags * 12;
+    } else if (profile.diet === "paleo") {
+      if (tags.includes("bone") || tags.includes("joint") || tags.includes("inflammation")) s += 10;
+    } else if (profile.diet === "mediterranean") {
+      // Mediterranean is already well-balanced, slight boost to complementary items
+      if (tags.includes("heart") || tags.includes("cognitive")) s += 8;
+    }
+
+    // ————— 8. ACTIVITY LEVEL (bidirectional) —————
+    if (profile.activityLevel >= 0.75) {
+      let activeTags = tagOverlap(tags, ["activity_very active", "activity_active", "electrolyte", "recovery", "hydration", "joint", "inflammation"]);
+      s += activeTags * 12;
+      // Very active + age = joint stress
+      if (profile.ageRisk > 0.3 && (tags.includes("joint") || tags.includes("mobility"))) s += 10;
+    } else if (profile.activityLevel <= 0.25) {
+      let sedTags = tagOverlap(tags, ["activity_sedentary", "circulation", "metabolic", "energy"]);
+      s += sedTags * 10;
+      // Sedentary + high BMI = metabolic syndrome risk
+      if (profile.bmiRisk > 0.2 && tags.includes("metabolic")) s += 15;
+    }
+
+    // ————— 9. REGION (UV exposure, climate) —————
+    if (profile.region === "northern") {
+      if (tags.includes("region_northern")) s += 20;
+      // Low sun → vitamin D deficiency
+      if (tags.includes("bone") || tags.includes("immunity")) s += 8;
+    } else if (profile.region === "southern") {
+      if (tags.includes("region_southern")) s += 20;
+      // High UV → skin/eye stress
+      if (tags.includes("vision") || tags.includes("skin")) s += 10;
+      if (tags.includes("hydration")) s += 8;
+    } else if (profile.region === "coastal") {
+      // Generally good iodine/fish access, slight immune boost
+      if (tags.includes("immunity")) s += 5;
+    } else if (profile.region === "mountain") {
+      // Altitude → hydration and oxygen carrying
+      if (tags.includes("hydration") || tags.includes("energy") || tags.includes("iron")) s += 10;
+    }
+
+    // ————— 10. SUPPORT NEEDS (disability) —————
+    if (profile.disability !== "none") {
+      const disTag = "disability_" + profile.disability;
+      if (tags.includes(disTag)) s += 50;
+      // Adjacent support
+      if (profile.disability === "mobility") {
+        let adj = tagOverlap(tags, ["joint", "bone", "inflammation"]);
+        s += adj * 12;
+      } else if (profile.disability === "vision") {
+        let adj = tagOverlap(tags, ["vision", "antioxidant", "skin"]);
+        s += adj * 12;
+      } else if (profile.disability === "cognitive") {
+        let adj = tagOverlap(tags, ["cognitive", "sleep", "stress"]);
+        s += adj * 12;
+      }
+    }
+
+    // ————— 11. HEALTH FOCUS (primary intent — strongest signal) —————
+    const focusMap = {
+      heart:     { primary: ["heart", "bp_elevated", "circulation", "cholesterol"], weight: 40 },
+      liver:     { primary: ["liver", "antioxidant"], weight: 45 },
+      energy:    { primary: ["energy", "mitochondrial", "adaptogen", "b12"], weight: 35 },
+      digestion: { primary: ["digestion", "probiotic", "inflammation"], weight: 35 },
+      immunity:  { primary: ["immunity", "antioxidant", "probiotic"], weight: 40 },
+      general:   { primary: [], weight: 0 }
+    };
+    let focus = focusMap[profile.healthFocus] || focusMap.general;
+    if (focus.primary.length > 0) {
+      let hits = tagOverlap(tags, focus.primary);
+      // First hit gets full weight, subsequent hits get diminishing returns
+      if (hits > 0) s += focus.weight + (hits - 1) * 8;
+    }
+
+    // ————— 12. ETHNICITY-INFORMED ADJUSTMENTS —————
+    // Based on documented population-level nutritional epidemiology
+    if (profile.ethnicity === "african") {
+      if (tags.includes("bp_elevated") || tags.includes("heart")) s += 10;
+      // Higher vitamin D deficiency prevalence at northern latitudes
+      if (profile.region === "northern" && (tags.includes("bone") || tags.includes("immunity"))) s += 12;
+    } else if (profile.ethnicity === "asian") {
+      // Higher lactose intolerance prevalence, lower alcohol tolerance
+      if (tags.includes("bone")) s += 6;
+      if (profile.alcoholLevel > 0 && tags.includes("liver")) s += profile.alcoholLevel * 10;
+    } else if (profile.ethnicity === "hispanic") {
+      if (tags.includes("metabolic") || tags.includes("heart")) s += 6;
+    }
+
+    return s;
+  }
+
+  // ——— CATEGORY SELECTION with diversity enforcement ———
+  function getTopForCategory(category, limit = 5) {
+    let profile = getUserProfile();
+    let allProducts = store.getProducts();
+
+    // Score all products with strong category affinity bonus
+    let scored = allProducts
+      .filter(p => productAllowed(p, profile.diet))
+      .map(p => {
+        let tags = p.tags || [];
+        // Category membership is now a STRONG signal (not a weak +20)
+        let categoryAffinity = tags.includes(category) ? 40 : 0;
+        // Adjacent categories get partial credit
+        const adjacency = {
+          heart: ["circulation", "bp_elevated", "cholesterol", "metabolic"],
+          mobility: ["joint", "bone", "inflammation", "recovery"],
+          vision: ["antioxidant", "skin"],
+          cognitive: ["sleep", "stress", "adaptogen"],
+          hydration: ["electrolyte", "activity_very active", "activity_active"],
+          liver: ["antioxidant", "alcohol_heavy", "alcohol_medium", "smoking_heavy"]
+        };
+        let adjTags = adjacency[category] || [];
+        let adjHits = tagOverlap(tags, adjTags);
+        categoryAffinity += adjHits * 8;
+
+        let personalScore = scoreProduct(p, profile);
+        if (personalScore < 0) return null; // diet-excluded
+
+        // Combined: category fit is 55% of signal, personal relevance is 45%
+        let total = categoryAffinity * 0.55 + personalScore * 0.45;
+        return { product: p, total, categoryAffinity, personalScore, tags };
+      })
+      .filter(x => x !== null && (x.categoryAffinity > 0 || x.total > 10));
+
+    scored.sort((a, b) => b.total - a.total);
+
+    // ——— Diversity pass: avoid recommending 5 products that all do the same thing ———
+    let result = [];
+    let usedSubcategories = {};
+    for (let item of scored) {
+      if (result.length >= limit) break;
+      // Determine sub-category from first tag
+      let subCat = (item.tags[0] || "general");
+      let subCount = usedSubcategories[subCat] || 0;
+      // Allow max 2 products per sub-category in top-5
+      if (subCount < 2) {
+        result.push(item.product);
+        usedSubcategories[subCat] = subCount + 1;
+      }
+    }
+    // Fill remaining slots if diversity filtering was too aggressive
+    if (result.length < limit) {
+      for (let item of scored) {
+        if (result.length >= limit) break;
+        if (!result.includes(item.product)) {
+          result.push(item.product);
+        }
+      }
+    }
+
+    // Final fallback: pad with category-tagged products
+    if (result.length < limit) {
+      let fallback = allProducts.filter(p => p.tags && p.tags.includes(category) && !result.includes(p) && productAllowed(p, profile.diet));
+      for (let f of fallback) { result.push(f); if (result.length >= limit) break; }
+    }
+
+    return result.slice(0, limit);
+  }
+
+  // ——— NEED METERS: now responsive to ALL profile inputs ———
+  function computeNeeds(profile) {
+    let needs = { heart: 25, mobility: 25, vision: 25, cognitive: 25, hydration: 25, liver: 25 };
+
+    // Age (continuous scaling)
+    needs.heart    += profile.ageRisk * 30;
+    needs.mobility += profile.ageRisk * 28;
+    needs.vision   += profile.ageRisk * 25;
+    needs.cognitive += profile.ageRisk * 22;
+
+    // Alcohol (graduated)
+    needs.liver += profile.alcoholLevel * 45;
+    needs.heart += profile.alcoholLevel * 18;
+    needs.cognitive += profile.alcoholLevel * 10;
+    needs.hydration += profile.alcoholLevel * 12;
+
+    // Smoking (graduated)
+    needs.liver    += profile.smokingLevel * 35;
+    needs.heart    += profile.smokingLevel * 25;
+    needs.cognitive += profile.smokingLevel * 12;
+
+    // Compound: alcohol + smoking amplifies liver/heart
+    let compound = profile.alcoholLevel * profile.smokingLevel;
+    needs.liver += compound * 20;
+    needs.heart += compound * 15;
+
+    // Blood pressure
+    if (profile.bp === "elevated") { needs.heart += 28; }
+    else if (profile.bp === "low") { needs.hydration += 15; }
+
+    // BMI
+    needs.heart += profile.bmiRisk * 20;
+    needs.mobility += profile.bmiRisk * 15;
+
+    // Activity
+    if (profile.activityLevel >= 0.75) {
+      needs.hydration += 30;
+      needs.mobility += 12;
+    } else if (profile.activityLevel <= 0.25) {
+      needs.heart += 10;
+      needs.mobility += 8;
+    }
+
+    // Diet-driven needs
+    if (profile.diet === "vegan" || profile.diet === "vegetarian") {
+      needs.cognitive += 10; // B12 concern
+      needs.mobility += 8;  // calcium concern
+    }
+    if (profile.diet === "keto") {
+      needs.liver += 15;
+      needs.hydration += 18;
+    }
+
+    // Region
+    if (profile.region === "northern") {
+      needs.mobility += 8;  // vitamin D / bone
+      needs.cognitive += 5; // seasonal mood
+    }
+    if (profile.region === "southern") {
+      needs.vision += 10;
+      needs.hydration += 10;
+    }
+    if (profile.region === "mountain") {
+      needs.hydration += 12;
+    }
+
+    // Support needs
+    if (profile.disability === "mobility") needs.mobility += 40;
+    if (profile.disability === "vision") needs.vision += 45;
+    if (profile.disability === "cognitive") needs.cognitive += 40;
+
+    // Health focus amplifies the target category
+    const focusCat = { heart: "heart", liver: "liver", energy: "cognitive", digestion: "liver", immunity: "heart", general: null };
+    let fc = focusCat[profile.healthFocus];
+    if (fc && needs[fc] !== undefined) needs[fc] += 15;
+
+    // Ethnicity nuance
+    if (profile.ethnicity === "african") needs.heart += 8;
+    if (profile.ethnicity === "asian" && profile.alcoholLevel > 0) needs.liver += 8;
+
+    // Clamp all to [10, 100]
+    for (let k in needs) needs[k] = Math.max(10, Math.min(100, Math.round(needs[k])));
+    return needs;
+  }
+
+  function updateAllCategories() {
+    let profile = getUserProfile();
+    let needs = computeNeeds(profile);
+    let categories = ["heart","mobility","vision","cognitive","hydration","liver"];
+    let grid = document.getElementById("categoriesGrid");
+    grid.innerHTML = "";
+    for (let cat of categories) {
+      let prods = getTopForCategory(cat, 5);
+      let needScore = needs[cat];
+      let card = document.createElement("div");
+      card.className = "vital-card";
+      let icon = {heart:"❤️", mobility:"🦽", vision:"👁️", cognitive:"🧠", hydration:"💧", liver:"🧪"}[cat];
+      let title = {heart:"Heart Health", mobility:"Mobility & Joints", vision:"Vision", cognitive:"Cognitive", hydration:"Hydration", liver:"Liver Detox"}[cat];
+      card.innerHTML = `
+        <div><i class="fas fa-${cat==="heart"?"heartbeat":cat==="mobility"?"wheelchair":cat==="vision"?"eye":cat==="cognitive"?"brain":cat==="hydration"?"tint":"filter"}"></i> <strong>${icon} ${title}</strong></div>
+        <div class="meter-bar"><div class="meter-fill" style="width:${needScore}%"></div></div>
+        <div>Need: ${needScore}%</div>
+        <div class="product-option-list" id="list-${cat}"></div>
+        <button class="buy-all-category" data-cat="${cat}">🛒 Buy all (${prods.length})</button>
+      `;
+      grid.appendChild(card);
+      let listDiv = card.querySelector(`.product-option-list`);
+      listDiv.innerHTML = prods.map(p => `<span class="shop-link" data-id="${p.id}">🛒 ${p.name} ${getCategoryDots(p)}</span>`).join('');
+      // attach single add
+      listDiv.querySelectorAll(".shop-link").forEach(link => {
+        link.addEventListener("click", (e) => { e.preventDefault(); store.addToCart(link.dataset.id,1); });
+      });
+      // attach bulk buy
+      card.querySelector(".buy-all-category").addEventListener("click", () => {
+        let ids = Array.from(card.querySelectorAll(".shop-link")).map(l => l.dataset.id);
+        store.addMultiple(ids);
+      });
+    }
+  }
+
+  // Event handlers
+  function bindEvents() {
+    document.getElementById("refreshBtn").addEventListener("click", updateAllCategories);
+    // all inputs trigger update
+    let inputs = document.querySelectorAll("#age, #weight, #height, #ethnicity, #alcohol, #smoking, #health, #bp, #diet, #activity, #region, #disability");
+    inputs.forEach(i => i.addEventListener("input", updateAllCategories));
+    inputs.forEach(i => i.addEventListener("change", updateAllCategories));
+    // tier switching
+    document.querySelectorAll(".tier-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tier-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        store.activeTier = btn.dataset.tier;
+        store.renderProductGrid();
+        updateAllCategories();
+      });
+    });
+    // cart UI
+    let cartOverlay = document.getElementById("cartOverlay"), backdrop = document.getElementById("backdrop");
+    document.getElementById("cartIconBtn").onclick = () => { cartOverlay.classList.add("open"); backdrop.classList.add("show"); };
+    document.getElementById("closeCartBtn").onclick = () => { cartOverlay.classList.remove("open"); backdrop.classList.remove("show"); };
+    backdrop.onclick = () => { cartOverlay.classList.remove("open"); backdrop.classList.remove("show"); };
+    document.getElementById("openPaymentBtn").onclick = () => {
+      let b = store.breakdown();
+      document.getElementById("paymentDetails").innerHTML = `Total: $${b.total.toFixed(2)}`;
+      document.getElementById("paymentModal").classList.add("open");
+      cartOverlay.classList.remove("open");
+    };
+    document.getElementById("confirmPaymentBtn").onclick = () => {
+      if(store.cart.length===0) return;
+      store.toast(`✅ Paid $${store.total().toFixed(2)}`);
+      store.clearCart();
+      document.getElementById("paymentModal").classList.remove("open");
+    };
+    document.getElementById("closePaymentBtn").onclick = () => document.getElementById("paymentModal").classList.remove("open");
+    document.getElementById("applyPromoBtn").onclick = () => {
+      let ok = store.applyPromo(document.getElementById("promoCode").value);
+      store.toast(ok ? "Promo applied" : "Invalid");
+      store.updateUI();
+    };
+  }
+
+  store.updateUI();
+  bindEvents();
+  updateAllCategories();
+</script>
+</body>
+</html>
